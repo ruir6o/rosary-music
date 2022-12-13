@@ -11,6 +11,16 @@ jobs:
         with:
           rust-version: 1.65.0
           components: clippy rustfmt
+      - name: Setup | Install Cross
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cross
+          version: 0.2.4
+      - name: Setup | Pull Cross Docker Image
+        uses: ./.github/actions/pull-docker-image
+        with:
+          image: ghcr.io/cross-rs/armv7-unknown-linux-musleabihf
+          tag: 0.2.4
       - name: Build | Code Formatting
         uses: actions-rs/cargo@v1
         with:
@@ -34,5 +44,6 @@ jobs:
       - name: Build | Compile Release
         uses: actions-rs/cargo@v1
         with:
+          use-cross: true
           command: build
-          args: --offline --release
+          args: --offline --release --target armv7-unknown-linux-musleabihf
