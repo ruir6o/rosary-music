@@ -1,0 +1,38 @@
+name: Build Project
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v3
+      - name: Setup | Install Rust
+        uses: ATiltedTree/setup-rust@v1
+        with:
+          rust-version: 1.65.0
+          components: clippy rustfmt
+      - name: Build | Code Formatting
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --check
+      - name: Build | Check Code
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --offline --all-targets --all-features
+      - name: Build | Run Tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --offline --all-targets --all-features
+      - name: Build | Lint Code
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -Dwarnings
+      - name: Build | Compile Release
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --offline --release
