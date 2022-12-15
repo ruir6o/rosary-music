@@ -16,11 +16,17 @@ jobs:
         with:
           crate: cross
           version: 0.2.4
-      - name: Setup | Pull Cross Docker Image
+      - name: Setup | Build Cross Docker Image
         uses: ./.github/actions/pull-docker-image
         with:
-          image: ghcr.io/cross-rs/armv7-unknown-linux-musleabihf
-          tag: 0.2.4
+          context: .github/builder
+          image: armv7-unknown-linux-gnueabihf
+          tag: custom
+      - name: Setup | Prepare Multi-Architecture Builds
+        run: |
+          sudo apt-get install -y qemu binfmt-support qemu-user-static
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        shell: bash
       - name: Build | Code Formatting
         uses: actions-rs/cargo@v1
         with:
@@ -46,7 +52,7 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --offline --release --target armv7-unknown-linux-musleabihf
+          args: --offline --release --target armv7-unknown-linux-gnueabihf
       - name: Package | Login Docker Registry
         uses: docker/login-action@v2
         with:

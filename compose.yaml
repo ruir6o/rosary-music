@@ -1,0 +1,21 @@
+services:
+  database:
+    image: postgres:13.9-alpine
+    environment:
+      POSTGRES_USER: rosary_music
+      POSTGRES_PASSWORD: rosary_music
+      POSTGRES_DB: rosary_music_db
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -q -d rosary_music_db -U rosary_music" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+  rosary-music:
+    depends_on:
+      database:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
